@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>予約｜HOTEL SETOUCHI BLUE</title>
+  <meta name="description" content="HOTEL SETOUCHI BLUEの空室確認・予約リクエスト。チェックイン日、客室タイプ、朝食オプションを選択してお申し込みください。">
+  <meta property="og:title" content="予約｜HOTEL SETOUCHI BLUE">
+  <meta property="og:description" content="空室確認・予約リクエスト。瀬戸内海を望む今治のスモールデザインホテル。">
+  <meta property="og:image" content="assets/images/hotelsetouchiblue-exterior-main.webp">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css?v=11">
+</head>
+<body>
+
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-en">HOTEL SETOUCHI BLUE</span>
+        <span class="logo-ja">瀬戸内の青に、静けさをほどく。</span>
+      </a>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="rooms.html">Rooms</a></li>
+          <li><a href="stay.html">Stay</a></li>
+          <li><a href="breakfast.html">Breakfast</a></li>
+          <li><a href="location.html">Location</a></li>
+          <li><a href="cycle.html">Cycle</a></li>
+          <li><a href="access.html">Access</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="villa.html">Villa</a></li>
+        </ul>
+      </nav>
+      <a href="booking.html" class="btn-booking-header">Booking</a>
+      <button class="hamburger" id="hamburger" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="mobile-nav" id="mobile-nav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="rooms.html">Rooms</a></li>
+      <li><a href="stay.html">Stay</a></li>
+      <li><a href="breakfast.html">Breakfast</a></li>
+      <li><a href="location.html">Location</a></li>
+      <li><a href="cycle.html">Cycle</a></li>
+      <li><a href="access.html">Access</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="villa.html">Villa</a></li>
+    </ul>
+    <a href="booking.html" class="btn btn--filled btn-booking-mobile">Booking</a>
+  </nav>
+
+  <section class="page-hero page-hero--short">
+    <div class="page-hero__image">
+      <img src="assets/images/hotelsetouchiblue-booking-visual.webp" alt="予約">
+    </div>
+    <div class="page-hero__overlay"></div>
+    <div class="page-hero__inner">
+      <span class="page-hero__num en" aria-hidden="true">08</span>
+      <div class="page-hero__content">
+        <p class="page-hero__label en">Booking</p>
+        <h1 class="page-hero__title">予約リクエスト</h1>
+        <p class="page-hero__lead">日程と客室を選んで、静かな海辺の時間を予約する。</p>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="booking-layout">
+      <div class="booking-visual fade-in">
+        <img src="assets/images/hotelsetouchiblue-stay-night-terrace.webp" alt="夜のテラス">
+      </div>
+
+      <div class="booking-form-wrap fade-in">
+        <h2 class="booking-form__title">空室確認・予約リクエスト</h2>
+        <p class="booking-form__lead">ご希望の日程と客室をお選びください。内容確認後、24時間以内にご連絡いたします。</p>
+
+        <!-- Calendar -->
+        <div class="calendar">
+          <div class="calendar__header">
+            <span class="calendar__month" id="calendar-month"></span>
+            <div class="calendar__nav">
+              <button type="button" id="cal-prev" aria-label="前月">‹</button>
+              <button type="button" id="cal-next" aria-label="翌月">›</button>
+            </div>
+          </div>
+          <div class="calendar__grid" id="calendar-grid"></div>
+          <div class="calendar__legend">
+            <span class="legend-available">空室あり</span>
+            <span class="legend-limited">残りわずか</span>
+            <span class="legend-selected">選択中</span>
+          </div>
+        </div>
+
+        <form id="booking-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="checkin">チェックイン</label>
+              <input type="date" id="checkin" name="checkin" required>
+            </div>
+            <div class="form-group">
+              <label for="checkout">チェックアウト</label>
+              <input type="date" id="checkout" name="checkout" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="guests">人数</label>
+              <select id="guests" name="guests">
+                <option value="1">1名</option>
+                <option value="2" selected>2名</option>
+                <option value="3">3名</option>
+                <option value="4">4名</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="room-type">客室タイプ</label>
+              <select id="room-type" name="room-type">
+                <option value="blue-standard">BLUE STANDARD — 朝凪（¥24,000〜）</option>
+                <option value="horizon-twin">HORIZON TWIN — 水面（¥36,000〜）</option>
+                <option value="terrace-room">TERRACE ROOM — 島風（¥54,000〜）</option>
+                <option value="setouchi-suite">SETOUCHI SUITE — 夕凪（¥88,000〜）</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-checkbox">
+              <input type="checkbox" id="breakfast" name="breakfast">
+              朝食付き（¥2,000 / 名）
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="name">お名前</label>
+            <input type="text" id="name" name="name" placeholder="山田 太郎" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">メールアドレス</label>
+            <input type="email" id="email" name="email" placeholder="example@email.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">電話番号</label>
+            <input type="tel" id="phone" name="phone" placeholder="090-0000-0000">
+          </div>
+
+          <div class="form-group">
+            <label for="notes">ご希望・備考</label>
+            <textarea id="notes" name="notes" rows="4" placeholder="記念日のご利用、アレルギー、レンタサイクルのご希望など"></textarea>
+          </div>
+
+          <div class="price-estimate">
+            <p class="price-estimate__label en">Estimated Total</p>
+            <p class="price-estimate__amount" id="price-amount">¥—</p>
+            <p class="price-estimate__breakdown" id="price-breakdown">日程と客室を選択してください</p>
+          </div>
+
+          <button type="submit" class="btn btn--filled" style="width:100%;margin-top:8px;">予約リクエストを送信</button>
+        </form>
+
+        <div class="booking-success" id="booking-success">
+          <p class="booking-success__title">予約リクエストを受け付けました。</p>
+          <p class="booking-success__text">内容確認後、24時間以内にご連絡いたします。しばらくお待ちください。</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="logo-en en">HOTEL SETOUCHI BLUE</span>
+          <p>瀬戸内の青に、静けさをほどく。愛媛・今治、しまなみ海道の海辺に佇む全12室のスモールデザインホテル。</p>
+        </div>
+        <div>
+          <p class="footer-heading en">Navigate</p>
+          <ul class="footer-nav">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="rooms.html">Rooms</a></li>
+            <li><a href="stay.html">Stay</a></li>
+            <li><a href="breakfast.html">Breakfast</a></li>
+            <li><a href="location.html">Location</a></li>
+            <li><a href="cycle.html">Cycle</a></li>
+            <li><a href="access.html">Access</a></li>
+            <li><a href="booking.html">Booking</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-heading en">Contact</p>
+          <ul class="footer-nav">
+            <li>愛媛県今治市 瀬戸内海岸エリア</li>
+            <li>TEL 0898-00-0000</li>
+            <li>CHECK IN 15:00 / OUT 11:00</li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-heading en">Sister Property</p>
+          <ul class="footer-nav">
+            <li><a href="villa.html">SETOUCHI BLUE VILLA</a></li>
+          </ul>
+          <div class="footer-sns" style="margin-top:24px;">
+            <a href="#">Instagram</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 HOTEL SETOUCHI BLUE. All Rights Reserved.</span>
+        <span><a href="privacy.html">プライバシーポリシー</a> · Portfolio Project — Fictional Hotel</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js?v=3"></script>
+</body>
+</html>
