@@ -11,7 +11,7 @@
   <meta property="og:type" content="website">
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <link rel="stylesheet" href="css/style.css?v=11">
+  <link rel="stylesheet" href="css/style.css?v=16">
 </head>
 <body>
 
@@ -58,7 +58,7 @@
 
   <section class="page-hero page-hero--short">
     <div class="page-hero__image">
-      <img src="assets/images/hotelsetouchiblue-booking-visual.webp" alt="予約">
+      <img loading="eager" fetchpriority="high" decoding="async" src="assets/images/hotelsetouchiblue-booking-visual.webp" alt="予約">
     </div>
     <div class="page-hero__overlay"></div>
     <div class="page-hero__inner">
@@ -74,12 +74,35 @@
   <main class="container">
     <div class="booking-layout">
       <div class="booking-visual fade-in">
-        <img src="assets/images/hotelsetouchiblue-stay-night-terrace.webp" alt="夜のテラス">
+        <img loading="lazy" decoding="async" src="assets/images/hotelsetouchiblue-stay-night-terrace.webp" alt="夜のテラス">
       </div>
 
       <div class="booking-form-wrap fade-in">
         <h2 class="booking-form__title">空室確認・予約リクエスト</h2>
         <p class="booking-form__lead">ご希望の日程と客室をお選びください。内容確認後、24時間以内にご連絡いたします。</p>
+
+        <div class="booking-notes" aria-label="ご予約前の確認事項">
+          <div class="booking-note">
+            <span class="booking-note__label en">Cancel</span>
+            <p>7日前まで無料、6〜3日前30%、2日前〜前日50%、当日・不泊100%。</p>
+          </div>
+          <div class="booking-note">
+            <span class="booking-note__label en">Payment</span>
+            <p>現地決済。現金、クレジットカード、主要QR決済をご利用いただけます。</p>
+          </div>
+          <div class="booking-note">
+            <span class="booking-note__label en">Children</span>
+            <p>お子様の宿泊可。ベビーベッドは無料・要予約、添い寝は未就学児まで。</p>
+          </div>
+          <div class="booking-note">
+            <span class="booking-note__label en">Parking</span>
+            <p>宿泊者無料の駐車場12台。大型車は事前にご相談ください。</p>
+          </div>
+          <div class="booking-note">
+            <span class="booking-note__label en">Check-in</span>
+            <p>15:00〜21:00。到着時はフロントでお名前をお伝えください。</p>
+          </div>
+        </div>
 
         <!-- Calendar -->
         <div class="calendar">
@@ -128,6 +151,7 @@
                 <option value="terrace-room">TERRACE ROOM — 島風（¥54,000〜）</option>
                 <option value="setouchi-suite">SETOUCHI SUITE — 夕凪（¥88,000〜）</option>
               </select>
+              <p class="form-help" id="room-capacity-help">定員に合わせて人数を選択してください。</p>
             </div>
           </div>
 
@@ -158,7 +182,9 @@
             <textarea id="notes" name="notes" rows="4" placeholder="記念日のご利用、アレルギー、レンタサイクルのご希望など"></textarea>
           </div>
 
-          <div class="price-estimate">
+          <p class="form-error" id="booking-error" role="alert" aria-live="assertive"></p>
+
+          <div class="price-estimate" aria-live="polite">
             <p class="price-estimate__label en">Estimated Total</p>
             <p class="price-estimate__amount" id="price-amount">¥—</p>
             <p class="price-estimate__breakdown" id="price-breakdown">日程と客室を選択してください</p>
@@ -210,7 +236,7 @@
             <li><a href="https://dohiwebc.github.io/SETOUCHIBLUEVILLA/" target="_blank" rel="noopener noreferrer">SETOUCHI BLUE VILLA</a></li>
           </ul>
           <div class="footer-sns" style="margin-top:24px;">
-            <a href="#">Instagram</a>
+            <span class="footer-link-muted">Instagram 準備中</span>
           </div>
         </div>
       </div>
@@ -221,6 +247,6 @@
     </div>
   </footer>
 
-  <script src="js/main.js?v=3"></script>
+  <script src="js/main.js?v=4"></script>
 </body>
 </html>

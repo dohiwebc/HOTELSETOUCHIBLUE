@@ -11,7 +11,7 @@
   <meta property="og:type" content="website">
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-  <link rel="stylesheet" href="css/style.css?v=14">
+  <link rel="stylesheet" href="css/style.css?v=16">
 </head>
 <body>
 
@@ -58,7 +58,7 @@
 
   <section class="page-hero page-hero--short">
     <div class="page-hero__image">
-      <img src="assets/images/hotelsetouchiblue-room-setouchi-suite.webp" alt="客室">
+      <img loading="eager" fetchpriority="high" decoding="async" src="assets/images/hotelsetouchiblue-room-setouchi-suite.webp" alt="客室">
     </div>
     <div class="page-hero__overlay"></div>
     <div class="page-hero__inner">
@@ -75,43 +75,47 @@
       <div class="room-grid fade-in">
         <article class="room-card" id="blue-standard">
           <div class="room-card__image">
-            <img src="assets/images/hotelsetouchiblue-room-blue-standard.webp" alt="BLUE STANDARD 朝凪">
+            <img loading="lazy" decoding="async" src="assets/images/hotelsetouchiblue-room-blue-standard.webp" alt="BLUE STANDARD 朝凪">
           </div>
           <p class="room-card__en en">BLUE STANDARD</p>
           <h2 class="room-card__name">朝凪</h2>
           <p class="room-card__meta">4室 · 1〜2名</p>
           <p class="room-card__price">¥24,000〜 / 1室</p>
           <p class="room-card__desc">静かな朝の光が差し込む、コンパクトなオーシャンビュールーム。シンプルな設えの中に、くすみブルーを基調とした落ち着いた空間。カップルやお一人での滞在に最適です。</p>
+          <a href="booking.html?room=blue-standard" class="room-card__booking">この部屋で予約</a>
         </article>
         <article class="room-card" id="horizon-twin">
           <div class="room-card__image">
-            <img src="assets/images/hotelsetouchiblue-room-horizon-twin.webp" alt="HORIZON TWIN 水面">
+            <img loading="lazy" decoding="async" src="assets/images/hotelsetouchiblue-room-horizon-twin.webp" alt="HORIZON TWIN 水面">
           </div>
           <p class="room-card__en en">HORIZON TWIN</p>
           <h2 class="room-card__name">水面</h2>
           <p class="room-card__meta">4室 · 2名</p>
           <p class="room-card__price">¥36,000〜 / 1室</p>
           <p class="room-card__desc">窓際のチェアから海と水平線を眺める。ツイン配置の落ち着いた空間で、夫婦や友人との滞在に。</p>
+          <a href="booking.html?room=horizon-twin" class="room-card__booking">この部屋で予約</a>
         </article>
         <article class="room-card" id="terrace-room">
           <div class="room-card__image">
-            <img src="assets/images/hotelsetouchiblue-room-terrace-room.webp" alt="TERRACE ROOM 島風">
+            <img loading="lazy" decoding="async" src="assets/images/hotelsetouchiblue-room-terrace-room.webp" alt="TERRACE ROOM 島風">
           </div>
           <p class="room-card__en en">TERRACE ROOM</p>
           <h2 class="room-card__name">島風</h2>
           <p class="room-card__meta">2室 · 2〜4名</p>
           <p class="room-card__price">¥54,000〜 / 1室</p>
           <p class="room-card__desc">プライベートテラスから島々を望む。2〜4名でゆったりと過ごせる、開放的な客室。</p>
+          <a href="booking.html?room=terrace-room" class="room-card__booking">この部屋で予約</a>
         </article>
         <article class="room-card" id="setouchi-suite">
           <div class="room-card__image">
-            <img src="assets/images/hotelsetouchiblue-room-setouchi-suite.webp" alt="SETOUCHI SUITE 夕凪">
+            <img loading="lazy" decoding="async" src="assets/images/hotelsetouchiblue-room-setouchi-suite.webp" alt="SETOUCHI SUITE 夕凪">
           </div>
           <p class="room-card__en en">SETOUCHI SUITE</p>
           <h2 class="room-card__name">夕凪</h2>
           <p class="room-card__meta">2室 · 2名</p>
           <p class="room-card__price">¥88,000〜 / 1室</p>
           <p class="room-card__desc">リビングと寝室を備えた最上級スイート。夕暮れの瀬戸内を独り占めに。記念日や特別な旅のための空間。</p>
+          <a href="booking.html?room=setouchi-suite" class="room-card__booking">この部屋で予約</a>
         </article>
       </div>
     </div>
@@ -228,7 +232,7 @@
             <li><a href="https://dohiwebc.github.io/SETOUCHIBLUEVILLA/" target="_blank" rel="noopener noreferrer">SETOUCHI BLUE VILLA</a></li>
           </ul>
           <div class="footer-sns" style="margin-top:24px;">
-            <a href="#">Instagram</a>
+            <span class="footer-link-muted">Instagram 準備中</span>
           </div>
         </div>
       </div>
@@ -239,6 +243,6 @@
     </div>
   </footer>
 
-  <script src="js/main.js?v=3"></script>
+  <script src="js/main.js?v=4"></script>
 </body>
 </html>

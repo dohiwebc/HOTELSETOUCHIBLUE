@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeader();
   initCurrentNav();
   initMobileNav();
+  initFixedBookingCta();
   initFadeIn();
   initFaq();
   initBooking();
@@ -94,19 +95,57 @@ function initMobileNav() {
   const mobileNav = document.getElementById('mobile-nav');
   if (!hamburger || !mobileNav) return;
 
+  hamburger.setAttribute('aria-controls', mobileNav.id);
+  hamburger.setAttribute('aria-expanded', 'false');
+
+  const closeNav = () => {
+    hamburger.classList.remove('is-active');
+    mobileNav.classList.remove('is-open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', 'メニューを開く');
+    document.body.style.overflow = '';
+  };
+
+  const openNav = () => {
+    hamburger.classList.add('is-active');
+    mobileNav.classList.add('is-open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    hamburger.setAttribute('aria-label', 'メニューを閉じる');
+    document.body.style.overflow = 'hidden';
+  };
+
   hamburger.addEventListener('click', () => {
-    const isOpen = hamburger.classList.toggle('is-active');
-    mobileNav.classList.toggle('is-open', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+    const isOpen = hamburger.classList.contains('is-active');
+    if (isOpen) closeNav();
+    else openNav();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && mobileNav.classList.contains('is-open')) {
+      closeNav();
+      hamburger.focus();
+    }
   });
 
   mobileNav.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
-      hamburger.classList.remove('is-active');
-      mobileNav.classList.remove('is-open');
-      document.body.style.overflow = '';
+      closeNav();
     });
   });
+}
+
+/* ---- Mobile fixed booking CTA ---- */
+function initFixedBookingCta() {
+  const file = (window.location.pathname.split('/').pop() || 'index.html').split('#')[0];
+  if (file === 'booking.html') return;
+
+  const cta = document.createElement('a');
+  cta.href = 'booking.html';
+  cta.className = 'fixed-booking-cta';
+  cta.setAttribute('aria-label', '予約ページへ移動');
+  cta.innerHTML = '予約する <span>空室確認へ</span>';
+  document.body.appendChild(cta);
+  document.body.classList.add('has-fixed-booking-cta');
 }
 
 /* ---- Fade in on scroll ---- */
@@ -131,12 +170,15 @@ function initFaq() {
   const items = document.querySelectorAll('.faq-item');
   if (!items.length) return;
 
-  items.forEach(item => {
+  items.forEach((item, index) => {
     const btn = item.querySelector('.faq-question');
     const answer = item.querySelector('.faq-answer');
     if (!btn || !answer) return;
 
+    if (!answer.id) answer.id = `faq-answer-${index + 1}`;
+    btn.setAttribute('aria-controls', answer.id);
     btn.setAttribute('aria-expanded', 'false');
+    answer.setAttribute('aria-hidden', 'true');
 
     btn.addEventListener('click', () => {
       const isOpen = item.classList.contains('is-open');
@@ -157,6 +199,7 @@ function openFaqItem(item) {
   item.classList.add('is-open');
   answer.style.maxHeight = `${answer.scrollHeight}px`;
   if (btn) btn.setAttribute('aria-expanded', 'true');
+  if (answer) answer.setAttribute('aria-hidden', 'false');
 }
 
 function closeFaqItem(item) {
@@ -165,18 +208,46 @@ function closeFaqItem(item) {
   item.classList.remove('is-open');
   answer.style.maxHeight = '0';
   if (btn) btn.setAttribute('aria-expanded', 'false');
+  if (answer) answer.setAttribute('aria-hidden', 'true');
+}
+
+function parseDateInput(value) {
+  if (!value) return null;
+  const parts = value.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+  return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+function formatDateInput(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function addDays(date, days) {
+  const next = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function dispatchFieldChange(field) {
+  if (!field) return;
+  field.dispatchEvent(new Event('input', { bubbles: true }));
+  field.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 /* ---- Booking page ---- */
 function initBooking() {
   const form = document.getElementById('booking-form');
   if (!form) return;
+  form.noValidate = true;
 
-  const roomPrices = {
-    'blue-standard': 24000,
-    'horizon-twin': 36000,
-    'terrace-room': 54000,
-    'setouchi-suite': 88000
+  const rooms = {
+    'blue-standard': { label: 'BLUE STANDARD — 朝凪', price: 24000, minGuests: 1, maxGuests: 2 },
+    'horizon-twin': { label: 'HORIZON TWIN — 水面', price: 36000, minGuests: 2, maxGuests: 2 },
+    'terrace-room': { label: 'TERRACE ROOM — 島風', price: 54000, minGuests: 2, maxGuests: 4 },
+    'setouchi-suite': { label: 'SETOUCHI SUITE — 夕凪', price: 88000, minGuests: 2, maxGuests: 2 }
   };
 
   const breakfastPrice = 2000;
@@ -188,28 +259,98 @@ function initBooking() {
   const priceAmount = document.getElementById('price-amount');
   const priceBreakdown = document.getElementById('price-breakdown');
   const successMsg = document.getElementById('booking-success');
+  const capacityHelp = document.getElementById('room-capacity-help');
+  const bookingError = document.getElementById('booking-error');
+  const submitButton = form.querySelector('button[type="submit"]');
+
+  const requestedRoom = new URLSearchParams(window.location.search).get('room');
+  if (requestedRoom && rooms[requestedRoom] && roomType) {
+    roomType.value = requestedRoom;
+  }
+
+  if (capacityHelp) {
+    guests?.setAttribute('aria-describedby', capacityHelp.id);
+    roomType?.setAttribute('aria-describedby', capacityHelp.id);
+  }
+
+  function getSelectedRoom() {
+    return rooms[roomType?.value] || rooms['blue-standard'];
+  }
+
+  function syncGuestOptions() {
+    if (!guests) return;
+    const room = getSelectedRoom();
+    const current = parseInt(guests.value, 10) || room.minGuests;
+
+    Array.from(guests.options).forEach(option => {
+      const value = parseInt(option.value, 10);
+      option.disabled = value < room.minGuests || value > room.maxGuests;
+    });
+
+    if (current < room.minGuests) guests.value = String(room.minGuests);
+    if (current > room.maxGuests) guests.value = String(room.maxGuests);
+
+    if (capacityHelp) {
+      const capacity = room.minGuests === room.maxGuests
+        ? `${room.maxGuests}名`
+        : `${room.minGuests}〜${room.maxGuests}名`;
+      capacityHelp.textContent = `${room.label}の定員は${capacity}です。`;
+    }
+  }
+
+  function syncDateConstraints() {
+    if (!checkin || !checkout) return;
+    const today = new Date();
+    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const todayValue = formatDateInput(todayDate);
+
+    checkin.min = todayValue;
+    if (checkin.value && checkin.value < todayValue) {
+      checkin.value = todayValue;
+    }
+
+    const checkinDate = parseDateInput(checkin.value);
+    const minCheckout = checkinDate ? addDays(checkinDate, 1) : addDays(todayDate, 1);
+    checkout.min = formatDateInput(minCheckout);
+  }
+
+  function validateStay(showMessage = false) {
+    if (!checkin || !checkout) return true;
+    const start = parseDateInput(checkin.value);
+    const end = parseDateInput(checkout.value);
+    let message = '';
+
+    if (start && end && end <= start) {
+      message = 'チェックアウトはチェックイン翌日以降を選択してください。';
+    }
+
+    checkout.setCustomValidity(message);
+    if (bookingError) bookingError.textContent = showMessage ? message : '';
+    return !message;
+  }
 
   function calcNights() {
-    if (!checkin.value || !checkout.value) return 0;
-    const start = new Date(checkin.value);
-    const end = new Date(checkout.value);
-    const diff = (end - start) / (1000 * 60 * 60 * 24);
-    return diff > 0 ? diff : 0;
+    const start = parseDateInput(checkin?.value);
+    const end = parseDateInput(checkout?.value);
+    if (!start || !end || end <= start) return 0;
+    return (end - start) / (1000 * 60 * 60 * 24);
   }
 
   function updatePrice() {
-    const nights = calcNights();
-    const room = roomType.value;
-    const basePrice = roomPrices[room] || 0;
-    const hasBreakfast = breakfast.checked;
-    const numGuests = parseInt(guests.value) || 1;
+    syncGuestOptions();
+    validateStay(false);
 
-    let total = basePrice * nights;
+    const nights = calcNights();
+    const room = getSelectedRoom();
+    const hasBreakfast = Boolean(breakfast?.checked);
+    const numGuests = parseInt(guests?.value, 10) || room.minGuests;
+
+    let total = room.price * nights;
     if (hasBreakfast) total += breakfastPrice * numGuests * nights;
 
-    if (nights > 0 && basePrice > 0) {
+    if (nights > 0) {
       priceAmount.textContent = '¥' + total.toLocaleString() + '〜';
-      let breakdown = `${nights}泊 × ¥${basePrice.toLocaleString()}`;
+      let breakdown = `${room.label} / ${nights}泊 × ¥${room.price.toLocaleString()}`;
       if (hasBreakfast) breakdown += ` + 朝食 ¥${(breakfastPrice * numGuests * nights).toLocaleString()}`;
       priceBreakdown.textContent = breakdown;
     } else {
@@ -218,19 +359,37 @@ function initBooking() {
     }
   }
 
-  [checkin, checkout, roomType, guests, breakfast].forEach(el => {
-    if (el) el.addEventListener('change', updatePrice);
+  checkin?.addEventListener('change', () => {
+    syncDateConstraints();
+    updatePrice();
   });
+  checkout?.addEventListener('change', updatePrice);
+  roomType?.addEventListener('change', updatePrice);
+  guests?.addEventListener('change', updatePrice);
+  breakfast?.addEventListener('change', updatePrice);
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    syncDateConstraints();
+    const stayValid = validateStay(true);
+
+    if (typeof form.reportValidity === 'function' && !form.reportValidity()) {
+      return;
+    }
+    if (!stayValid) {
+      checkout?.focus();
+      return;
+    }
+
     if (successMsg) {
       successMsg.classList.add('is-show');
       successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    form.querySelector('button[type="submit"]').disabled = true;
+    if (submitButton) submitButton.disabled = true;
   });
 
+  syncDateConstraints();
+  syncGuestOptions();
   initCalendar();
   updatePrice();
 }
@@ -241,17 +400,28 @@ function initCalendar() {
   const monthLabel = document.getElementById('calendar-month');
   const prevBtn = document.getElementById('cal-prev');
   const nextBtn = document.getElementById('cal-next');
+  const checkin = document.getElementById('checkin');
+  const checkout = document.getElementById('checkout');
   if (!grid || !monthLabel) return;
 
-  let currentDate = new Date();
-  let selectedStart = null;
-  let selectedEnd = null;
+  const today = new Date();
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  let currentDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+  let selectedStart = parseDateInput(checkin?.value);
+  let selectedEnd = parseDateInput(checkout?.value);
 
-  const unavailable = new Set();
-  // ランダムに数室を不可に（見た目用）
-  const seed = currentDate.getMonth();
-  for (let d = 1; d <= 28; d++) {
-    if ((d + seed) % 5 === 0) unavailable.add(d);
+  function getAvailability(dateObj) {
+    if (dateObj < todayDate) return { status: 'past', label: '選択できません', disabled: true };
+    const seed = dateObj.getFullYear() + dateObj.getMonth() + dateObj.getDate();
+    if (seed % 9 === 0) return { status: 'unavailable', label: '満室', disabled: true };
+    if (seed % 5 === 0) return { status: 'limited', label: '残りわずか', disabled: false };
+    return { status: 'available', label: '空室あり', disabled: false };
+  }
+
+  function syncFromInputs() {
+    selectedStart = parseDateInput(checkin?.value);
+    selectedEnd = parseDateInput(checkout?.value);
+    render();
   }
 
   function render() {
@@ -261,88 +431,93 @@ function initCalendar() {
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const today = new Date();
+    const firstVisibleMonth = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+
+    if (prevBtn) {
+      prevBtn.disabled = currentDate <= firstVisibleMonth;
+      prevBtn.setAttribute('aria-disabled', String(prevBtn.disabled));
+    }
 
     grid.innerHTML = '';
 
     const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
-    dayNames.forEach(d => {
+    dayNames.forEach(dayName => {
       const el = document.createElement('div');
       el.className = 'calendar__day-name';
-      el.textContent = d;
+      el.textContent = dayName;
       grid.appendChild(el);
     });
 
     for (let i = 0; i < firstDay; i++) {
       const el = document.createElement('div');
       el.className = 'calendar__day is-empty';
+      el.setAttribute('aria-hidden', 'true');
       grid.appendChild(el);
     }
 
-    for (let d = 1; d <= daysInMonth; d++) {
-      const el = document.createElement('div');
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateObj = new Date(year, month, day);
+      const iso = formatDateInput(dateObj);
+      const availability = getAvailability(dateObj);
+      const el = document.createElement('button');
+      el.type = 'button';
       el.className = 'calendar__day';
-      el.textContent = d;
+      el.textContent = day;
+      el.setAttribute('aria-label', `${year}年${month + 1}月${day}日 ${availability.label}`);
 
-      const dateObj = new Date(year, month, d);
-      if (dateObj < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+      if (availability.status === 'limited') {
+        el.classList.add('is-limited');
+      }
+      if (availability.disabled) {
         el.classList.add('is-disabled');
-      } else if (unavailable.has(d)) {
-        el.classList.add('is-disabled');
-        el.title = '満室';
+        el.disabled = true;
+        el.title = availability.label;
       }
 
-      if (selectedStart && d === selectedStart.getDate() && month === selectedStart.getMonth()) {
+      const isStart = selectedStart && iso === formatDateInput(selectedStart);
+      const isEnd = selectedEnd && iso === formatDateInput(selectedEnd);
+      if (isStart || isEnd) {
         el.classList.add('is-selected');
-      }
-      if (selectedEnd && d === selectedEnd.getDate() && month === selectedEnd.getMonth()) {
-        el.classList.add('is-selected');
-      }
-      if (selectedStart && selectedEnd) {
-        const cur = new Date(year, month, d);
-        if (cur > selectedStart && cur < selectedEnd) el.classList.add('is-range');
+        el.setAttribute('aria-pressed', 'true');
+      } else {
+        el.setAttribute('aria-pressed', 'false');
       }
 
-      if (!el.classList.contains('is-disabled')) {
-        el.addEventListener('click', () => selectDate(year, month, d));
+      if (selectedStart && selectedEnd && dateObj > selectedStart && dateObj < selectedEnd) {
+        el.classList.add('is-range');
+      }
+
+      if (!availability.disabled) {
+        el.addEventListener('click', () => selectDate(dateObj));
       }
 
       grid.appendChild(el);
     }
   }
 
-  function selectDate(year, month, day) {
-    const date = new Date(year, month, day);
-    const checkin = document.getElementById('checkin');
-    const checkout = document.getElementById('checkout');
-
-    if (!selectedStart || (selectedStart && selectedEnd)) {
+  function selectDate(date) {
+    if (!selectedStart || selectedEnd) {
       selectedStart = date;
       selectedEnd = null;
-      if (checkin) checkin.value = formatDate(date);
+      if (checkin) checkin.value = formatDateInput(date);
+      if (checkout) checkout.value = '';
+    } else if (date <= selectedStart) {
+      selectedStart = date;
+      selectedEnd = null;
+      if (checkin) checkin.value = formatDateInput(date);
       if (checkout) checkout.value = '';
     } else {
-      if (date <= selectedStart) {
-        selectedStart = date;
-        selectedEnd = null;
-        if (checkin) checkin.value = formatDate(date);
-        if (checkout) checkout.value = '';
-      } else {
-        selectedEnd = date;
-        if (checkout) checkout.value = formatDate(date);
-      }
+      selectedEnd = date;
+      if (checkout) checkout.value = formatDateInput(date);
     }
+
     render();
-    const event = new Event('change');
-    if (checkin) checkin.dispatchEvent(event);
+    dispatchFieldChange(checkin);
+    dispatchFieldChange(checkout);
   }
 
-  function formatDate(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
+  checkin?.addEventListener('change', syncFromInputs);
+  checkout?.addEventListener('change', syncFromInputs);
 
   if (prevBtn) prevBtn.addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
