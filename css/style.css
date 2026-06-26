@@ -21,7 +21,9 @@
   --font-serif: 'Noto Serif JP', serif;
   --font-sans: 'Noto Sans JP', sans-serif;
 
-  --header-h: 76px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --header-base-h: 76px;
+  --header-h: calc(var(--header-base-h) + var(--safe-top));
   --max-w: 1340px;
   --text-col: 680px;
   --text-col-wide: 760px;
@@ -194,6 +196,7 @@ ul { list-style: none; }
   width: 100%;
   z-index: 1000;
   height: var(--header-h);
+  padding-top: var(--safe-top);
   transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease);
 }
 
@@ -371,6 +374,7 @@ ul { list-style: none; }
 .mobile-nav {
   position: fixed;
   inset: 0;
+  padding-top: var(--safe-top);
   background: var(--white);
   z-index: 999;
   display: flex;
